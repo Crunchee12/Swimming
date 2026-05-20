@@ -6,11 +6,24 @@ const closeBtn = document.getElementById('closeBtn');
 const downloadBtn = document.getElementById('downloadBtn');
 let currentImageSrc = "";
 
+// Helper: get ALL keys with pagination (no limit)
+async function getAllKeys(prefix) {
+  let allKeys = [];
+  let cursor = null;
+  while (true) {
+    const res = await window.storage.list(prefix, false, { cursor, limit: 1000 });
+    if (!res || !res.keys) break;
+    allKeys = allKeys.concat(res.keys);
+    if (!res.next_cursor) break;
+    cursor = res.next_cursor;
+  }
+  return allKeys;
+}
+
 // Load saved images from persistent storage on page load
 window.addEventListener("DOMContentLoaded", async () => {
   try {
-    const keys = await window.storage.list('img:');
-    const allKeys = (keys && keys.keys) ? keys.keys : [];
+    const allKeys = await getAllKeys('img:');
     allKeys.sort();
     for (const key of allKeys) {
       const res = await window.storage.get(key);
@@ -75,8 +88,7 @@ downloadBtn.addEventListener("click", () => {
 // Clear gallery (reset persistent storage)
 async function clearGallery() {
   try {
-    const keys = await window.storage.list('img:');
-    const allKeys = (keys && keys.keys) ? keys.keys : [];
+    const allKeys = await getAllKeys('img:');
     for (const key of allKeys) await window.storage.delete(key);
     gallery.innerHTML = "";
   } catch (e) {
