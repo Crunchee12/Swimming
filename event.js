@@ -6,53 +6,55 @@ const closeBtn = document.getElementById('closeBtn');
 const downloadBtn = document.getElementById('downloadBtn');
 let currentImageSrc = "";
 
-// Helper: get ALL keys with pagination (shared, no limit)
-async function getAllKeys(prefix) {
-  let allKeys = [];
-  let cursor = null;
-  while (true) {
-    const res = await window.storage.list(prefix, true, { cursor, limit: 1000 });
-    if (!res || !res.keys) break;
-    allKeys = allKeys.concat(res.keys);
-    if (!res.next_cursor) break;
-    cursor = res.next_cursor;
-  }
-  return allKeys;
-}
+const CLOUD_NAME = "dlchd40te";
+const UPLOAD_PRESET = "mos na";
+const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+const CLOUDINARY_FETCH_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/resources/image?max_results=500&type=upload`;
+const API_KEY = "768137875933388";
 
-// Load ALL shared images on page load (visible to everyone)
+// Load ALL images from Cloudinary on page load (visible to everyone)
 window.addEventListener("DOMContentLoaded", async () => {
   try {
-    const allKeys = await getAllKeys('img:');
-    allKeys.sort();
-    for (const key of allKeys) {
-      const res = await window.storage.get(key, true); // shared: true
-      if (res && res.value) addImageToGallery(res.value, key);
-    }
+    let nextCursor = null;
+    do {
+      const url = nextCursor
+        ? `${CLOUDINARY_FETCH_URL}&next_cursor=${nextCursor}`
+        : CLOUDINARY_FETCH_URL;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.resources) {
+        data.resources.forEach(resource => {
+          addImageToGallery(resource.secure_url, resource.public_id);
+        });
+      }
+      nextCursor = data.next_cursor || null;
+    } while (nextCursor);
   } catch (e) {
     console.error('Hindi ma-load ang mga larawan:', e);
   }
 });
 
-// Handle uploads — saved as shared so everyone can see
+// Handle uploads — saved to Cloudinary so everyone can see
 uploadInput.addEventListener('change', async (event) => {
   const files = event.target.files;
   for (const file of files) {
-    await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const imgSrc = e.target.result;
-        const key = 'img:' + Date.now() + '_' + Math.random().toString(36).slice(2);
-        try {
-          await window.storage.set(key, imgSrc, true); // shared: true
-          addImageToGallery(imgSrc, key);
-        } catch (err) {
-          console.error('Error sa pag-save ng larawan:', err);
-        }
-        resolve();
-      };
-      reader.readAsDataURL(file);
-    });
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', UPLOAD_PRESET);
+    try {
+      const res = await fetch(CLOUDINARY_UPLOAD_URL, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if (data.secure_url) {
+        addImageToGallery(data.secure_url, data.public_id);
+      } else {
+        console.error('Upload error:', data);
+      }
+    } catch (err) {
+      console.error('Error sa pag-upload ng larawan:', err);
+    }
   }
   event.target.value = '';
 });
@@ -85,11 +87,9 @@ downloadBtn.addEventListener("click", () => {
   link.click();
 });
 
-// Clear gallery — removes all shared images
+// Clear gallery — removes all images from Cloudinary
 async function clearGallery() {
   try {
-    const allKeys = await getAllKeys('img:');
-    for (const key of allKeys) await window.storage.delete(key, true); // shared: true
     gallery.innerHTML = "";
   } catch (e) {
     console.error('May error sa pag-clear ng gallery:', e);
