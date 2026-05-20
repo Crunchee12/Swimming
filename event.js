@@ -17,8 +17,9 @@ uploadInput.addEventListener('change', (event) => {
       img.src = e.target.result;
       img.title = "Click to preview";
 
-      // Open modal on click
-      img.addEventListener("click", () => {
+      // Open modal on click (prevent default mobile behavior)
+      img.addEventListener("click", (ev) => {
+        ev.preventDefault(); // stop auto-download/open
         modal.style.display = "block";
         modalImg.src = e.target.result;
         currentImageSrc = e.target.result;
