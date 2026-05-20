@@ -10,15 +10,13 @@ let currentImageSrc = "";
 // Load saved images from LocalStorage on page load
 window.addEventListener("DOMContentLoaded", () => {
   const savedImages = JSON.parse(localStorage.getItem("galleryImages")) || [];
-  savedImages.forEach(src => {
-    addImageToGallery(src);
-  });
+  savedImages.forEach(src => addImageToGallery(src));
 });
 
 // Handle uploads
 uploadInput.addEventListener('change', (event) => {
   const files = event.target.files;
-  const savedImages = JSON.parse(localStorage.getItem("galleryImages")) || [];
+  let savedImages = JSON.parse(localStorage.getItem("galleryImages")) || [];
 
   for (let file of files) {
     const reader = new FileReader();
@@ -26,7 +24,7 @@ uploadInput.addEventListener('change', (event) => {
       const imgSrc = e.target.result;
       addImageToGallery(imgSrc);
 
-      // Save to LocalStorage
+      // Save to LocalStorage (append new image)
       savedImages.push(imgSrc);
       localStorage.setItem("galleryImages", JSON.stringify(savedImages));
     };
@@ -62,3 +60,9 @@ downloadBtn.addEventListener("click", () => {
   link.download = "downloaded_image.png";
   link.click();
 });
+
+// Optional: Clear gallery button (reset LocalStorage)
+function clearGallery() {
+  localStorage.removeItem("galleryImages");
+  gallery.innerHTML = "";
+}
