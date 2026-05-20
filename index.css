@@ -1,9 +1,5 @@
-/* General Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Reset */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: "Segoe UI", Arial, sans-serif;
@@ -23,17 +19,11 @@ header {
   animation: fadeInDown 1s ease-in-out;
 }
 
-header h1 {
-  font-size: 2rem;
-  margin-bottom: 10px;
-}
-
 /* Upload Section */
 .upload-section {
   text-align: center;
   margin: 20px;
 }
-
 .upload-label {
   display: inline-block;
   background: #4caf50;
@@ -43,14 +33,8 @@ header h1 {
   cursor: pointer;
   transition: background 0.3s;
 }
-
-.upload-label:hover {
-  background: #388e3c;
-}
-
-#upload {
-  display: none;
-}
+.upload-label:hover { background: #388e3c; }
+#upload { display: none; }
 
 /* Gallery */
 .gallery {
@@ -59,7 +43,6 @@ header h1 {
   gap: 15px;
   padding: 20px;
 }
-
 .gallery img {
   width: 100%;
   border-radius: 10px;
@@ -68,11 +51,46 @@ header h1 {
   cursor: pointer;
   animation: fadeInUp 0.8s ease-in-out;
 }
-
 .gallery img:hover {
   transform: scale(1.05);
   box-shadow: 0 8px 16px rgba(0,0,0,0.3);
 }
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  padding-top: 60px;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  text-align: center;
+}
+.modal img {
+  max-width: 90%;
+  max-height: 70%;
+  border-radius: 10px;
+  animation: zoomIn 0.5s ease;
+}
+#closeBtn {
+  position: absolute;
+  top: 20px; right: 30px;
+  font-size: 40px;
+  color: white;
+  cursor: pointer;
+}
+#downloadBtn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+#downloadBtn:hover { background: #e68900; }
 
 /* Footer */
 footer {
@@ -88,8 +106,11 @@ footer {
   from { opacity: 0; transform: translateY(-20px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+@keyframes zoomIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
