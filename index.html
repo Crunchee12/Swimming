@@ -9,7 +9,7 @@
 <body>
   <header>
     <h1>📸 Event Image Gallery</h1>
-    <p>Upload and download HD images for your events</p>
+    <p>Upload and preview HD images</p>
   </header>
 
   <main>
@@ -21,8 +21,15 @@
     <section id="gallery" class="gallery"></section>
   </main>
 
+  <!-- Modal for preview -->
+  <div id="modal" class="modal">
+    <span id="closeBtn">&times;</span>
+    <img id="modalImg" src="" alt="Preview">
+    <button id="downloadBtn">Download HD</button>
+  </div>
+
   <footer>
-    <p>Made By Tino</p>
+    <p>Made with ❤️ for professional submission</p>
   </footer>
 
   <script src="event.js"></script>
